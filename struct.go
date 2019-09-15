@@ -8,6 +8,7 @@ package astinspector
 import (
 	"go/ast"
 	"go/token"
+	"strings"
 )
 
 // Struct abstract an ast.TypeSpec
@@ -74,7 +75,7 @@ func StructByName(node ast.Node, name string) Struct {
 			for i := range d.Specs {
 				ts := d.Specs[i].(*ast.TypeSpec)
 
-				if ts.Name.Name == name {
+				if strings.EqualFold(ts.Name.Name, name) {
 					s = &iStruct{ts}
 
 					return false
