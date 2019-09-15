@@ -15,6 +15,7 @@ import (
 type File interface {
 	StructByName(name string) Struct
 	PackageName() string
+	Structs(...string) StructList
 }
 
 // iFile
@@ -31,6 +32,11 @@ func (f *iFile) StructByName(name string) Struct {
 // PackageName return the name of the package.
 func (f *iFile) PackageName() string {
 	return f.Name.String()
+}
+
+// Structs return list of structure.
+func (f *iFile) Structs(names ...string) StructList {
+	return Structs(f.File, names...)
 }
 
 // ParseFile parse the given filename.

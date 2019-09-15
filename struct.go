@@ -8,8 +8,41 @@ package astinspector
 import (
 	"go/ast"
 	"go/token"
-	"strings"
 )
+
+// StructList is a list of struct.
+type StructList []Struct
+
+// Len says the size of the slice.
+func (sl StructList) Len() int {
+	return len(sl)
+}
+
+// FindByName return the struct matching with the given name.
+func (sl StructList) FindByName(name string) Struct {
+	for _, s := range sl {
+		if v := StructByName(s.AstTypeSpec(), name); v != nil {
+			return v
+		}
+	}
+	return nil
+}
+
+// First return the first element of the slice.
+func (sl StructList) First() Struct {
+	if sl.Len() > 0 {
+		return sl[0]
+	}
+	return nil
+}
+
+// Names return the names of the structs.
+func (sl StructList) Names() (out []string) {
+	for _, s := range sl {
+		out = append(out, s.Name())
+	}
+	return
+}
 
 // Struct abstract an ast.TypeSpec
 type Struct interface {
@@ -63,8 +96,11 @@ func (s *iStruct) AddField(name string, t string) Field {
 
 // StructByName return a struct composed of *ast.TypeSpec.
 func StructByName(node ast.Node, name string) Struct {
-	var s *iStruct
+	return Structs(node, name).First()
+}
 
+// Structs return a list of structs defined in the given node.
+func Structs(node ast.Node, names ...string) (out StructList) {
 	ast.Inspect(node, func(n ast.Node) bool {
 		switch d := n.(type) {
 		case *ast.GenDecl:
@@ -74,16 +110,21 @@ func StructByName(node ast.Node, name string) Struct {
 
 			for i := range d.Specs {
 				ts := d.Specs[i].(*ast.TypeSpec)
-
-				if strings.EqualFold(ts.Name.Name, name) {
-					s = &iStruct{ts}
-
-					return false
+				if len(names) > 0 {
+					for _, name := range names {
+						if ts.Name.Name == name {
+							out = append(out, &iStruct{ts})
+							break
+						}
+					}
+				} else {
+					out = append(out, &iStruct{ts})
 				}
 			}
+			return false
 		}
-
 		return true
 	})
-	return s
+
+	return
 }
