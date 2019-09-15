@@ -14,21 +14,25 @@ go get -u github.com/kovacou/go-astinspector
 
 ```go
 f := astinspector.ParseFile("../go-astinspector/testdata/struct.go")
-f.PackageName() // testdata
+f.Structs().Names() // []string{"User", "Test"}
+f.Structs("User", "Toto").Names() // []string{"User"}
+f.PackageName() // testdata 
 
-u := f.StructByName("user")
-u.AddField("CustomField", "string")
-u.Name() // User
+if u := f.StructByName("User"); u != nil {
+    u.AddField("CustomField", "string")
+    u.Name() // User
 
-for _, field := range u.Fields() {
-    fmt.Printf("%s %s\n", field.Name(), field.Type())
+    for _, field := range u.Fields() {
+        fmt.Printf("%s %s\n", field.Name(), field.Type())
+    }
+
+    // Print: 
+    //
+    // ID uint64
+    // Name string
+    // Birthday *time.Time
+    // CustomField string
 }
 
-// Print: 
-//
-// ID uint64
-// Name string
-// Birthday *time.Time
-// CustomField string
 
 ```

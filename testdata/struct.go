@@ -13,3 +13,9 @@ type User struct {
 	Name     string
 	Birthday *time.Time
 }
+
+// Test is a test struct.
+type Test struct {
+	Field      string
+	IntegerPtr *int64
+}
