@@ -50,6 +50,7 @@ type Struct interface {
 	Fields() []Field
 	AddField(name, typ string) Field
 	AstTypeSpec() *ast.TypeSpec
+	IsValid() bool
 }
 
 type iStruct struct {
